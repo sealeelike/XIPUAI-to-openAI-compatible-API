@@ -19,14 +19,12 @@
 - auth模块需使用chrome浏览器
 
 ### 具体操作
-
-- 使用conda创建新环境并激活
-  `conda create --name genai_project python=3.10`
+- 把[环境配置](environment.yml)下载到本地的某个空文件夹
+- 在该文件夹打开cmd
+- 使用conda复制环境
+  `conda env create -f environment.yml`
+- 激活环境
   `conda activate genai_project`
-- 安装FastAPI
-  `pip install fastapi "uvicorn[standard]" httpx`
-- 安装openAI库
-  `pip install openai`
 
 ## 演示
 
