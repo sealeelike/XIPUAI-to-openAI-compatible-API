@@ -41,6 +41,8 @@
   （电脑需要安装chrome浏览器）
 - 启动[adapter服务](xjtlu_adapter_final.py)
   `uvicorn xjtli_adapter_finnal:app --reload`
+
+  同时会在项目文件夹内生成log文件夹，里面有日志
 - 桌面客户端对接
   新建服务商，类型openAI compatible，apiKEY随便写几个英文字母，baseurl`http://127.0.0.1:8000/v1/chat/completions`。模型可写`moonshot-v1-128k`(其他没研究，请自行探索)
 
