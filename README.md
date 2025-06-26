@@ -1,13 +1,13 @@
 # XIPUAI-to-openAI-compatible-API
 
+## Description
+
+把xipuAI网页服务转化成API调用服务
+
 ## background
 之前看到有人把 Google AI Studio 逆向成 openAI格式 的API服务，用以免费使用时兴的 2.5pro(https://github.com/CJackHwang/AIstudioProxyAPI)
 我看到洗脚利物浦xipuAI平台上的 o3，sonnet3.7等昂贵模型，不由冒出了同样的想法。
 
-
-## Description
-
-把xipuAI网页服务转化成API调用服务
 
 ## Getting Started
 
