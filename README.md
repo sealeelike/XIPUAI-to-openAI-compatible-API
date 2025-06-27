@@ -67,7 +67,10 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 
 ### auth.py
 
-这个脚本会获取env文件里的用户名密码，并启动临时chrome窗口，模拟用户填写密码，再截获所需的令牌，存储到env文件。
+- 获取env文件里的用户名密码
+- 启动临时chrome窗口
+- 模拟用户填写密码，点击“log in”
+- 截获所需的令牌，存储到env文件。
 
 每次获取新令牌都会覆盖老令牌
 
