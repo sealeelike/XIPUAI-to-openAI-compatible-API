@@ -79,7 +79,7 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 ### adapter.py
 
 
-当桌面客户端（如LobeChat）向我们的适配器发起一次对话请求时，会发生以下一系列事件：
+当桌面客户端（如cherry studio）向我们的适配器发起一次对话请求时，会发生以下一系列事件：
 
 1.  **接收请求 (`chat_proxy`)**:
     *   FastAPI 接收到一个符合OpenAI格式的 `POST /v1/chat/completions` 请求。
