@@ -64,6 +64,7 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 这只是一个简单的密码存储脚本。
 
 用户用它输入一次用户名和密码，它写入根目录env文件。这样以后就可以自动读取，不用重复输入。
+
 ---
 ### auth.py
 
@@ -73,6 +74,7 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 - 截获所需的令牌，存储到env文件。
 
 每次获取新令牌都会覆盖老令牌
+
 ---
 ### adapter.py
 
