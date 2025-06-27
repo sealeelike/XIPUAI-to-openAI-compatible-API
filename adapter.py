@@ -29,7 +29,7 @@ MAX_CONTENT_LENGTH = 1500 # Slightly increased, but still active.
 # ==                 调试开关：自动删除功能已屏蔽                  ==
 # ==    将此值改为 True 即可重新启用“完成对话后自动删除会话”功能   ==
 # ===================================================================
-ENABLE_AUTO_DELETION = False
+ENABLE_AUTO_DELETION = True
 
 AVAILABLE_MODELS = [
     "DeepSeek-R1", "DeepseekR1联网", "qwen-2.5-72b", "gpt-4.1-nano", "gpt-4.1",
