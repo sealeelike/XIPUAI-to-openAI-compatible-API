@@ -40,7 +40,7 @@
   全程无需任何操作，等待终端提示即可。
   （电脑需要安装chrome浏览器）
 - 启动[adapter服务](xjtlu_adapter_final.py)
-  `uvicorn xjtli_adapter_finnal:app --reload`
+  `uvicorn xjtlu_adapter_final:app --reload`
 
   同时会在项目文件夹内生成log文件夹，里面有日志
 - 桌面客户端对接
