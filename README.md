@@ -59,6 +59,16 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 
 ## 原理讲解
 
+### config
+
+这只是一个简单的密码存储脚本。
+
+用户用它输入一次用户名和密码，它写入根目录env文件。这样以后就可以自动读取，不用重复输入。
+
+### auth
+
+这个脚本会获取env文件里的用户名密码，并启动临时chrome窗口，模拟用户填写密码，再截获所需的令牌，存储到env文件。
+
 ## License
 
 This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
