@@ -2,7 +2,7 @@
 
 ## 概述
 
-把xipuAI网页服务转化成API调用服务
+把xipuAI网页服务转化成API调用服务，支持知识库，上下文，联网搜索，temperature···
 
 ## 背景
 之前看到有人把 Google AI Studio 逆向成 openAI格式 的API服务，用以免费使用时兴的 2.5pro(https://github.com/CJackHwang/AIstudioProxyAPI)
@@ -40,16 +40,16 @@
   全程无需任何操作，等待终端提示即可。
   （电脑需要安装chrome浏览器）
 - 启动[adapter服务](xjtlu_adapter_final.py)
-  `uvicorn xjtlu_adapter_final:app --reload`
+  `uvicorn adapter:app --reload`
 
   同时会在项目文件夹内生成log文件夹，里面有日志
 - 桌面客户端对接
-  新建服务商，类型openAI compatible，apiKEY随便写几个英文字母，baseurl`http://127.0.0.1:8000/v1/chat/completions`。模型可写`moonshot-v1-128k`(其他没研究，请自行探索)
+  新建服务商，类型openAI compatible，apiKEY随便写几个英文字母，baseurl`http://127.0.0.1:8000/v1/chat/completions`。
 
 #### 尝试使用
 可以正常使用。
 
-刷新网页，也会显示你的内容
+刷新xipu官方网页，也会同步你的内容
 
 ## 演示
 
