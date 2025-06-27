@@ -74,6 +74,8 @@ https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=shari
 
 每次获取新令牌都会覆盖老令牌
 
+### adapter.py
+
 ## License
 
 This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
