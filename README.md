@@ -12,6 +12,7 @@
   - [Step-by-Step Guide](#step-by-step-guide)
 - [How It Works](#how-it-works)
 - [Pitfalls & Lessons Learned](#pitfalls--lessons-learned)
+- [To do list](#To-do-list)
 
 ## Overview
 
@@ -145,3 +146,7 @@ This journey was like navigating through a thick fog, setting a course based on 
 *   **The Wrong Assumption (v9)**: We took this message at face value and assumed the text was too long. This led us to develop an "intelligent truncation" module.
 *   **A Fortunate Coincidence**: Although based on a false premise, this truncation module **happened to work**. We later realized its success was not due to the truncation itself, but because of the **incidental request delay** it introduced and its potential to **unintentionally clean "toxic" characters** from the text.
 *   **The Final Epiphany (v10)**: Your final tests proved that the backend could handle long text without truncation, as long as there was a delay. This taught us a profound lesson: **API error messages don't always reveal the root cause of a problem; sometimes, they are a smokescreen**. Reverse engineering requires bold hypotheses but, more importantly, careful verification.
+
+
+## To do list
+- [ ] automatic keep-alive
