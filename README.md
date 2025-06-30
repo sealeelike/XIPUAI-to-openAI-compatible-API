@@ -142,6 +142,3 @@
 *   **最终的顿悟 (v10)**: 你的最终测试证明了，即使不截断，只要有延迟，后端也能处理长文本。这告诉我们一个深刻的教训：**API返回的错误信息不一定能准确地揭示问题的根本原因**，它有时会是“烟雾弹”。逆向工程需要大胆假设，更要小心求证。
 
 
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
