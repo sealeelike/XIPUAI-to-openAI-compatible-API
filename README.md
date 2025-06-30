@@ -4,6 +4,8 @@
 
 把xipuAI网页服务转化成API调用服务，支持知识库，上下文，联网搜索，temperature···
 
+点击视频链接预览效果 https://drive.google.com/file/d/1-OGXcUYPfYZpAO9FbemmOAfxXSMPdFfM/view?usp=sharing
+
 ## 背景
 之前看到有人把 Google AI Studio 逆向成 openAI格式 的API服务，用以免费使用时兴的 2.5pro(https://github.com/CJackHwang/AIstudioProxyAPI)
 我看到洗脚利物浦xipuAI平台上的 o3，sonnet3.7等昂贵模型，不由冒出了同样的想法。
@@ -51,11 +53,7 @@
 #### 尝试使用
 新建一个会话，选择模型并尝试会话
 
-## 演示
 
-此处可观看演示视频
-
-https://drive.google.com/file/d/1zdsoDvZNL3ZOQWpaVhtDWx2kQRfcYgz8/view?usp=sharing
 
 ## 原理讲解
 
