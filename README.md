@@ -1,5 +1,18 @@
 # XIPUAI-to-OpenAI-compatible-API
 
+## Table of Contents
+
+[English](README.md)/[简体中文](README-zh.md)
+
+
+- [Overview](#overview)
+- [Background](#background)
+- [How to Use](#how-to-use)
+  - [Prerequisites](#prerequisites)
+  - [Step-by-Step Guide](#step-by-step-guide)
+- [How It Works](#how-it-works)
+- [Pitfalls & Lessons Learned](#pitfalls--lessons-learned)
+
 ## Overview
 
 This project transforms the XIPUAI web service into an OpenAI-compatible API, enabling API calls that support knowledge bases, context, web search, temperature settings, and more.
