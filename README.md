@@ -19,7 +19,7 @@
 
 This project transforms the XIPUAI web service into an OpenAI-compatible API, enabling API calls that support knowledge bases, context, web search, temperature settings, and more.
 
-> Click the video link for a preview: https://drive.google.com/file/d/1-OGXcUYPfYZpAO9FbemmOAfxXSMPdFfM/view?usp=sharing
+<mark>Click the video link for a preview: https://drive.google.com/file/d/1-OGXcUYPfYZpAO9FbemmOAfxXSMPdFfM/view?usp=sharing</mark>
 
 ## Background
 I was inspired by a project that reverse-engineered Google AI Studio into an OpenAI-formatted API service, allowing free use of the popular Gemini 2.5 Pro model ([CJackHwang/AIstudioProxyAPI](https://github.com/CJackHwang/AIstudioProxyAPI)).
