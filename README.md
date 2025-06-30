@@ -86,6 +86,11 @@ This is a simple script for storing credentials. The user enters their username 
 Each time a new token is fetched, it overwrites the old one.
 
 ---
+
+### expire.py
+Use base64 to decode the JWT_TOKEN in the `.env` directory to obtain relevant information. This is only used for exploration and does not affect the actual use effect.
+
+---
 ### adapter.py
 
 When a desktop client (like Cherry Studio) sends a chat request to our adapter, the following sequence of events unfolds:
