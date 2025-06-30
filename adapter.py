@@ -1,4 +1,4 @@
-# xjtlu_adapter_final_v11.py - Definitive Version with Truncation Logic & Debug Mode
+# xjtlu_adapter_final_v11.py - Definitive Version with Truncation Logic & Debug Mode + Heartbeat
 import os
 import httpx
 from fastapi import FastAPI, Request, HTTPException
@@ -8,7 +8,7 @@ import time
 import uuid
 import logging
 from logging.handlers import RotatingFileHandler
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv, find_dotenv, set_key
 from datetime import datetime
 import asyncio
 
@@ -27,9 +27,16 @@ INTER_REQUEST_DELAY = 1.0
 MAX_CONTENT_LENGTH = 1500 # Slightly increased, but still active.
 # ===================================================================
 # ==                 调试开关：自动删除功能已屏蔽                  ==
-# ==    将此值改为 True 即可重新启用“完成对话后自动删除会话”功能   ==
+# ==    将此值改为 True 即可重新启用"完成对话后自动删除会话"功能   ==
 # ===================================================================
 ENABLE_AUTO_DELETION = True
+
+# ===================================================================
+# ==                      心跳保活机制配置                         ==
+# ===================================================================
+ENABLE_HEARTBEAT = True  # 是否启用心跳保活
+HEARTBEAT_INTERVAL = 300  # 心跳间隔（秒），默认5分钟
+HEARTBEAT_SESSION_NAME = "API Heartbeat Session (DO NOT DELETE)"
 
 AVAILABLE_MODELS = [
     "DeepSeek-R1", "DeepseekR1联网", "qwen-2.5-72b", "gpt-4.1-nano", "gpt-4.1",
@@ -38,7 +45,6 @@ AVAILABLE_MODELS = [
 ]
 
 # --- Logging Setup ---
-# (此部分保持不变)
 LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 logger = logging.getLogger("adapter_logger")
@@ -52,13 +58,15 @@ if not logger.handlers:
 
 # --- FastAPI App & Helper Functions ---
 app = FastAPI(
-    title="XJTLU GenAI Adapter (v11 - Debug Mode)",
-    description="Reinstated the successful truncation logic. Auto-deletion is disabled. This is the definitive approach."
+    title="XJTLU GenAI Adapter (v11 - Debug Mode + Heartbeat)",
+    description="Reinstated the successful truncation logic. Auto-deletion is disabled. This is the definitive approach with heartbeat."
 )
 client = httpx.AsyncClient(timeout=120.0)
 
+# Global variable to store heartbeat task
+heartbeat_task = None
+
 def get_dynamic_headers():
-    # (此部分保持不变)
     load_dotenv(find_dotenv(), override=True)
     jm_token = os.getenv("JM_TOKEN")
     sdp_session = os.getenv("SDP_SESSION")
@@ -101,13 +109,14 @@ def process_and_format_prompt(messages: list) -> str:
     return full_prompt
 
 
-async def create_new_session(openai_request: dict):
-    # (此部分保持不变)
+async def create_new_session(openai_request: dict, session_name: str = None):
     headers = get_dynamic_headers()
-    session_name = f"API Request @ {datetime.now().strftime('%H:%M:%S')}"
+    if session_name is None:
+        session_name = f"API Request @ {datetime.now().strftime('%H:%M:%S')}"
+    
     payload = {
         "name": session_name,
-        "model": openai_request.get("model"),
+        "model": openai_request.get("model", AVAILABLE_MODELS[0]),
         "temperature": openai_request.get("temperature", 0.7),
         "maxToken": openai_request.get("max_tokens", 0),
         "presencePenalty": openai_request.get("presence_penalty", 0),
@@ -129,8 +138,92 @@ async def create_new_session(openai_request: dict):
         raise HTTPException(status_code=e.response.status_code, detail=f"Upstream API error during session creation: {e.response.text}")
 
 
+async def update_session(session_id: str, session_name: str = None):
+    """Update an existing session (used for heartbeat)"""
+    headers = get_dynamic_headers()
+    if session_name is None:
+        session_name = HEARTBEAT_SESSION_NAME
+    
+    payload = {
+        "id": int(session_id),
+        "name": session_name,
+        "model": AVAILABLE_MODELS[0],  # Use default model
+        "temperature": 0.7,
+        "maxToken": 0,
+        "presencePenalty": 0,
+        "frequencyPenalty": 0
+    }
+    
+    try:
+        response = await client.post(SESSION_API_URL, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        if data.get("code") != 0:
+            logger.error(f"Failed to update session {session_id}: {data.get('msg')}")
+            return False
+        logger.info(f"💓 Heartbeat: Successfully updated session {session_id}")
+        return True
+    except Exception as e:
+        logger.error(f"Heartbeat error: {e}")
+        return False
+
+
+async def init_heartbeat_session():
+    """Initialize or verify heartbeat session"""
+    env_file = find_dotenv()
+    heartbeat_session_id = os.getenv("HEARTBEAT_SESSION_ID")
+    
+    if heartbeat_session_id:
+        # Try to update existing session
+        logger.info(f"Found existing heartbeat session ID: {heartbeat_session_id}")
+        success = await update_session(heartbeat_session_id)
+        if success:
+            return heartbeat_session_id
+        else:
+            logger.warning("Existing heartbeat session is invalid, creating new one...")
+    
+    # Create new heartbeat session
+    try:
+        new_session_id = await create_new_session(
+            {"model": AVAILABLE_MODELS[0]}, 
+            session_name=HEARTBEAT_SESSION_NAME
+        )
+        # Save to .env file
+        set_key(env_file, "HEARTBEAT_SESSION_ID", new_session_id)
+        logger.info(f"✅ Created and saved new heartbeat session ID: {new_session_id}")
+        return new_session_id
+    except Exception as e:
+        logger.error(f"Failed to create heartbeat session: {e}")
+        return None
+
+
+async def heartbeat_task_func():
+    """Background task for sending heartbeats"""
+    heartbeat_session_id = await init_heartbeat_session()
+    if not heartbeat_session_id:
+        logger.error("Failed to initialize heartbeat session. Heartbeat disabled.")
+        return
+    
+    while True:
+        try:
+            await asyncio.sleep(HEARTBEAT_INTERVAL)
+            await update_session(heartbeat_session_id)
+            print(f"\n💓 Heartbeat sent at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (Session: {heartbeat_session_id})")
+        except asyncio.CancelledError:
+            logger.info("Heartbeat task cancelled.")
+            break
+        except Exception as e:
+            logger.error(f"Heartbeat error: {e}")
+            # Continue trying even if heartbeat fails
+
+
 async def delete_session(session_id: str):
-    # (此部分保持不变)
+    # Check if this is the heartbeat session
+    heartbeat_session_id = os.getenv("HEARTBEAT_SESSION_ID")
+    if session_id == heartbeat_session_id:
+        logger.warning(f"Attempted to delete heartbeat session {session_id}. Skipping.")
+        return
+    
     await asyncio.sleep(2.0)
     try:
         headers = get_dynamic_headers()
@@ -145,19 +238,41 @@ async def delete_session(session_id: str):
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Starting XJTLU GenAI Adapter (v11 - Final Debug)...")
+    global heartbeat_task
+    logger.info("Starting XJTLU GenAI Adapter (v11 - Final Debug + Heartbeat)...")
+    
+    print("\n" + "="*60)
+    print("🚀 XJTLU GenAI Adapter Started")
+    print("="*60)
+    print(f"📌 Auto-deletion: {'ENABLED' if ENABLE_AUTO_DELETION else 'DISABLED'}")
+    print(f"💓 Heartbeat: {'ENABLED' if ENABLE_HEARTBEAT else 'DISABLED'}")
+    if ENABLE_HEARTBEAT:
+        print(f"   - Interval: {HEARTBEAT_INTERVAL} seconds ({HEARTBEAT_INTERVAL/60:.1f} minutes)")
+        print(f"   - Initializing heartbeat session...")
+        heartbeat_task = asyncio.create_task(heartbeat_task_func())
+    print(f"📁 Logs: {os.path.join(LOG_DIR, log_filename)}")
+    print("="*60 + "\n")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    global heartbeat_task
+    if heartbeat_task:
+        heartbeat_task.cancel()
+        try:
+            await heartbeat_task
+        except asyncio.CancelledError:
+            pass
     await client.aclose()
     logger.info("Adapter shut down.")
 
+
 @app.get("/v1/models")
 async def list_models():
-    # (此部分保持不变)
     logger.info("Received request for model list.")
     model_list = [{"id": model_id, "object": "model", "created": int(time.time()), "owned_by": "XJTLU"} for model_id in AVAILABLE_MODELS]
     return JSONResponse(content={"object": "list", "data": model_list})
+
 
 @app.post("/v1/chat/completions")
 async def chat_proxy(request: Request):
@@ -190,7 +305,6 @@ async def chat_proxy(request: Request):
             logger.info(f"Sending final prompt to Session ID: {session_id_to_use}")
             async with client.stream("POST", CHAT_API_URL, json=xjtlu_payload, headers=get_dynamic_headers()) as response:
                 response.raise_for_status()
-                # (Stream parsing logic remains the same)
                 async for line in response.aiter_lines():
                     if line.startswith("data:"):
                         chunk_str = line[len("data:"):].strip()
