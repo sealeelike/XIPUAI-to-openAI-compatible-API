@@ -91,6 +91,11 @@ Each time a new token is fetched, it overwrites the old one.
 Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain relevant information. This is only used for exploration and does not affect the actual use effect.
 
 ---
+
+### run.bat
+Run commands in sequence to avoid manual input by the user
+
+---
 ### adapter.py
 
 When a desktop client (like Cherry Studio) sends a chat request to our adapter, the following sequence of events unfolds:
