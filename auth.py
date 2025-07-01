@@ -1,4 +1,4 @@
-# auth.py - Automated session token retrieval for XJTLU GenAI
+# auth.py - Automated session token retrieval for XJTLU GenAI (Headless Version)
 import time
 import os
 from seleniumwire import webdriver
@@ -16,9 +16,9 @@ captured_credentials = {
 
 def fetch_tokens():
     """
-    Launches a browser, performs SSO login, and intercepts network requests
+    Launches a headless browser, performs SSO login, and intercepts network requests
     using Chrome DevTools Protocol (CDP) to capture dynamic session tokens.
-    
+  
     This function relies on credentials stored in the .env file.
     """
     # Load credentials from .env file
@@ -31,27 +31,36 @@ def fetch_tokens():
         print("Please run 'python configure.py' first to set up your credentials.")
         return None
 
-    print("Initializing automated browser session...")
-    print("A Chrome window will open. Please wait patiently, no user input is required.")
+    print("🚀 Initializing headless browser session...")
+    print("📝 Running in headless mode - no browser window will appear")
+    print(f"👤 Using username: {username[:3]}***{username[-3:] if len(username) > 6 else '***'}")
 
     # Configure selenium-wire to intercept network traffic
     selenium_wire_options = {
         'disable_encoding': True  # To view raw headers
     }
-    
+  
     chrome_options = webdriver.ChromeOptions()
-    # Uncomment the next line to run in headless mode for server environments
-    # chrome_options.add_argument("--headless")
+    # Enable headless mode
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+
+    chrome_options.add_argument("--proxy-server=direct://")  # 明确指定直连模式
+    chrome_options.add_argument("--disable-proxy-discovery")  # 禁用自动代理检测
 
     driver = None
     try:
+        print("🔧 Starting Chrome driver in headless mode...")
         driver = webdriver.Chrome(
             seleniumwire_options=selenium_wire_options,
             options=chrome_options
         )
+        print("✅ Chrome driver initialized successfully")
 
         # Define a request interceptor to capture headers
         def interceptor(request):
@@ -60,94 +69,154 @@ def fetch_tokens():
 
             if jm_token_val and not captured_credentials["jm_token"]:
                 captured_credentials["jm_token"] = jm_token_val
-                print("  [INFO] Intercepted 'Jm-Token'.")
+                print("🔑 [TOKEN] Successfully intercepted 'Jm-Token'")
 
             if sdp_session_val and not captured_credentials["sdp_session"]:
                 captured_credentials["sdp_session"] = sdp_session_val
-                print("  [INFO] Intercepted 'Sdp-App-Session'.")
+                print("🔑 [TOKEN] Successfully intercepted 'Sdp-App-Session'")
 
         driver.request_interceptor = interceptor
-        print("Network interceptor deployed.")
+        print("🕸️  Network interceptor deployed and monitoring requests...")
 
         # --- Automation Flow ---
-        print("Step 1/3: Navigating and performing SSO login...")
+        print("\n📋 Starting SSO authentication process...")
+        print("Step 1/3: 🌐 Navigating to XJTLU GenAI portal...")
         driver.get("https://xipuai.xjtlu.edu.cn/")
-        
+        print("✅ Successfully loaded login page")
+      
         # Wait for and fill login form
-        WebDriverWait(driver, 20).until(
+        print("⏳ Waiting for login form to appear...")
+        username_field = WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.ID, "username_show"))
-        ).send_keys(username)
+        )
+        print("📝 Filling in username...")
+        username_field.send_keys(username)
         
+        print("📝 Filling in password...")
         driver.find_element(By.ID, "password_show").send_keys(password)
+        
+        print("🔘 Clicking login button...")
         driver.execute_script("arguments[0].click();", driver.find_element(By.CSS_SELECTOR, "#btn_login input"))
+        print("✅ Login form submitted")
 
-        print("Step 2/3: Navigating through post-login pages...")
-        WebDriverWait(driver, 20).until(
+        print("\nStep 2/3: 🔄 Processing post-login navigation...")
+        print("⏳ Waiting for post-login page to load...")
+        chat_link = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/v3/chat']"))
-        ).click()
+        )
+        print("🔗 Found chat link, clicking...")
+        chat_link.click()
+        print("✅ Successfully navigated to chat section")
 
-        WebDriverWait(driver, 20).until(
+        print("⏳ Waiting for chat interface to initialize...")
+        chat_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button:has(span.n-button__content)"))
-        ).click()
+        )
+        print("🔘 Found chat button, clicking...")
+        chat_button.click()
+        print("✅ Chat interface activated")
 
-        print("Step 3/3: Waiting for final page to initialize...")
+        print("\nStep 3/3: 🔍 Finalizing token capture...")
+        print("⏳ Waiting for textarea element to confirm page is ready...")
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "textarea"))
         )
-        print("Page initialized. Finalizing token capture...")
-        
+        print("✅ Chat interface fully loaded")
+        print("🔍 Monitoring network traffic for authentication tokens...")
+      
         # Allow time for initial API calls to be made and intercepted
-        end_time = time.time() + 8
+        token_capture_duration = 8
+        print(f"⏰ Waiting up to {token_capture_duration} seconds for token capture...")
+        
+        end_time = time.time() + token_capture_duration
+        progress_counter = 0
         while time.time() < end_time:
             if captured_credentials["jm_token"] and captured_credentials["sdp_session"]:
-                print("All tokens captured ahead of schedule.")
+                print("🎉 All required tokens captured successfully!")
                 break
+            
+            # Show progress every 2 seconds
+            if progress_counter % 4 == 0:
+                remaining = int(end_time - time.time())
+                tokens_status = []
+                if captured_credentials["jm_token"]:
+                    tokens_status.append("Jm-Token ✅")
+                else:
+                    tokens_status.append("Jm-Token ⏳")
+                    
+                if captured_credentials["sdp_session"]:
+                    tokens_status.append("Sdp-Session ✅")
+                else:
+                    tokens_status.append("Sdp-Session ⏳")
+                    
+                print(f"📊 Status: {' | '.join(tokens_status)} | Time remaining: {remaining}s")
+            
+            progress_counter += 1
             time.sleep(0.5)
 
         # --- Verification ---
+        print("\n🔍 Verifying token capture results...")
         if captured_credentials["jm_token"] and captured_credentials["sdp_session"]:
-            print("\n✅ Token retrieval successful.")
+            print("✅ SUCCESS: All authentication tokens captured successfully!")
+            print(f"🔑 Jm-Token: {captured_credentials['jm_token'][:20]}...{captured_credentials['jm_token'][-10:]}")
+            print(f"🔑 Sdp-Session: {captured_credentials['sdp_session'][:20]}...{captured_credentials['sdp_session'][-10:]}")
             return captured_credentials
         else:
-            print("\n❌ Failed to capture one or more tokens via network interception.")
+            print("❌ FAILURE: Unable to capture all required tokens")
+            missing_tokens = []
             if not captured_credentials["jm_token"]:
-                print("   - 'Jm-Token' was not found in any request headers.")
+                missing_tokens.append("'Jm-Token'")
             if not captured_credentials["sdp_session"]:
-                print("   - 'Sdp-App-Session' was not found in any request headers.")
+                missing_tokens.append("'Sdp-App-Session'")
+            print(f"📝 Missing tokens: {', '.join(missing_tokens)}")
+            
+            print("📸 Saving screenshot for debugging...")
             driver.save_screenshot("auth_error.png")
-            print("   Screenshot saved to 'auth_error.png' for debugging.")
+            print("💾 Screenshot saved to 'auth_error.png'")
             return None
 
     except TimeoutException as e:
-        print(f"\n❌ A timeout occurred during automation: {e}")
+        print(f"\n⏰ TIMEOUT ERROR: {e}")
+        print("📝 The automation process took longer than expected")
         if driver:
+            print("📸 Saving timeout screenshot for debugging...")
             driver.save_screenshot("auth_timeout_error.png")
-            print("   Screenshot saved to 'auth_timeout_error.png'.")
+            print("💾 Screenshot saved to 'auth_timeout_error.png'")
         return None
     except Exception as e:
-        print(f"\n❌ An unexpected error occurred: {e}")
+        print(f"\n❌ UNEXPECTED ERROR: {e}")
+        print("📝 An unexpected error occurred during the automation process")
         if driver:
+            print("📸 Saving error screenshot for debugging...")
             driver.save_screenshot("auth_unexpected_error.png")
-            print("   Screenshot saved to 'auth_unexpected_error.png'.")
+            print("💾 Screenshot saved to 'auth_unexpected_error.png'")
         return None
     finally:
         if driver:
-            print("Closing browser session.")
+            print("🔚 Closing headless browser session...")
             driver.quit()
+            print("✅ Browser session closed successfully")
 
 if __name__ == "__main__":
-    print("--- XJTLU GenAI Token Fetcher ---")
-    
+    print("=" * 50)
+    print("🤖 XJTLU GenAI Token Fetcher (Headless Mode)")
+    print("=" * 50)
+  
     retrieved_tokens = fetch_tokens()
-    
+  
     if retrieved_tokens:
         env_file = ".env"
         try:
+            print("\n💾 Saving tokens to .env file...")
             set_key(env_file, "JM_TOKEN", retrieved_tokens['jm_token'])
             set_key(env_file, "SDP_SESSION", retrieved_tokens['sdp_session'])
-            print("\n✅ Successfully updated JM_TOKEN and SDP_SESSION in '.env' file.")
-            print("You can now start the API adapter service.")
+            print("✅ SUCCESS: Tokens saved to '.env' file successfully!")
+            print("🚀 You can now start the API adapter service.")
         except Exception as e:
-            print(f"\n❌ Error writing tokens to .env file: {e}")
+            print(f"❌ ERROR: Failed to save tokens to .env file: {e}")
     else:
-        print("\nToken retrieval failed. Please check the logs for more details.")
+        print("\n❌ FAILURE: Token retrieval unsuccessful")
+        print("📋 Please check the logs above for detailed error information")
+        print("💡 Tip: Check the generated screenshot files for visual debugging")
+        
+    print("=" * 50)
