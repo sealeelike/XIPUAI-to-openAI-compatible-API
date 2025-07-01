@@ -6,7 +6,7 @@ REM ===== 激活 conda 环境 =====
 call conda activate genai_project
 
 REM ===== 运行验证脚本 =====
-python authopus.py
+python auth.py
 
 REM ===== 启动 uvicorn 服务 =====
 uvicorn adapter:app --reload
