@@ -184,9 +184,10 @@ This journey was like navigating through a thick fog, setting a course based on 
 ## Common Errors
 |Error|Reason|Measure|
 |--|--|--|
-|`403`|Token expired|Re-run auth.py|
-|`don't have relevant knowledge`|Enter "poison text", the backend cannot read it|Delete the last conversation of this session|
-|`INFO:     127.0.0.1:7607 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error`|Token error|re-run auth.py|
+|"403"|Token expired|Re-run auth.py|
+|"don't have relevant knowledge"|Enter "poison text", the backend cannot read it|Delete the last conversation of this session|
+|'INFO:     127.0.0.1:7607 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error'|Token error|re-run auth.py|
+|"Request Err!"|unknown|?|
 
 ## To do list
 - [ ] automatic keep-alive
