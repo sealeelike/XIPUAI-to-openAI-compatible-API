@@ -92,7 +92,7 @@ Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain
 
 ---
 
-### precheck.py
+### precheck.py & run.bat
 Run commands in sequence to avoid manual input by the user
 ```mermaid
 flowchart TD
