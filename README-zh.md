@@ -92,7 +92,7 @@
 
 ---
 
-### precheck.py
+### precheck.py & run.bat
 代替用户手动输入命令，完成部分自检工作。
 
 ```mermaid
