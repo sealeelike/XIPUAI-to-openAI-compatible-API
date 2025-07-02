@@ -96,32 +96,24 @@ Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain
 Run commands in sequence to avoid manual input by the user
 ```mermaid
 flowchart TD
-  A[Start checking] --> B{.env file exists?}
-  
-  B -->|No|C[Run config.py]
-  B -->|Yes|D[Load environment variables]
-  
-  D --> E{Username and password exist?}
-  E -->|No|C
-  E -->|Yes|F{Token complete?}
-  
-  F -->|No|G[Run auth.py]
-  F -->|Yes|H[Run tokentest.py]
-  
-  H --> I{Check successful?}
-  I -->|No|G
-  I -->|Yes|J{Refresh EXPIRE status}
-  
-  J -->|Yes|K[Start uvicorn service]
-  J -->|No|G
-  
-  C --> L{config successful?}
-  L -->|No|M[Exit]
-  L -->|Yes|G
-  
-  G --> N{auth successful?}
-  N -->|No|M
-  N -->|Yes|K
+  Start --> A[Find .env file]
+  A -- Does not exist --> C[Run config.py]
+  A -- Exists --> B{Load and check environment variables}
+  B --> B1
+  B1[Check credentials] --> B2{Do credentials exist?}
+  B2 -- No --> C
+  B2 -- Yes --> B3[Check token]
+  B3 --> B4{Does token exist?}
+  B4 -- No --> D[Run auth.py]
+  B4 -- Yes --> E[Run tokentest.py]
+  C -- Success --> D
+  E -- Token is valid --> F[Start service]
+  E -- Token is invalid --> D
+  D -- Success --> F
+  C -- Failure --> Z[Program exits]
+  D -- Failure --> Z
+  F -- Failure --> Z
+  F -- Success --> H[Service running]
 ```
 
 ---
