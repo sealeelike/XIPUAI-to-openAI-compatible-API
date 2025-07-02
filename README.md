@@ -95,7 +95,7 @@ Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain
 ### run.bat
 Run commands in sequence to avoid manual input by the user
 ```mermaid
-graph TD
+flowchart TD
     A[Start] --> B(Activate Conda Env);
     B --> C{Check Credentials };
     C -- Missing/Empty --> D[Run config.py];
