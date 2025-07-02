@@ -95,25 +95,31 @@ Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain
 ### precheck.py & run.bat
 Run commands in sequence to avoid manual input by the user
 ```mermaid
-flowchart TD
-  Start --> A[Find .env file]
-  A -- Does not exist --> C[Run config.py]
-  A -- Exists --> B{Load and check environment variables}
-  B --> B1
-  B1[Check credentials] --> B2{Do credentials exist?}
-  B2 -- No --> C
-  B2 -- Yes --> B3[Check token]
-  B3 --> B4{Does token exist?}
-  B4 -- No --> D[Run auth.py]
-  B4 -- Yes --> E[Run tokentest.py]
-  C -- Success --> D
-  E -- Token is valid --> F[Start service]
-  E -- Token is invalid --> D
-  D -- Success --> F
-  C -- Failure --> Z[Program exits]
-  D -- Failure --> Z
-  F -- Failure --> Z
-  F -- Success --> H[Service running]
+graph TD
+    subgraph precheck.py
+        A{.env file exist?}
+        A --exist--> D{username & password exist?}
+        A --does not exist--> 1
+
+        D --all exist--> E
+        D --dose not exist--> 1
+
+        E --> F{tokens exist?}
+        F --D.N.E.--> 2
+        F --exist--> H{heartbeat session exist?}
+        H --exist--> I{tokentest.py}
+        H --D.N.E.--> 2
+
+
+        I --EXPIRE--> 2
+        I --valid--> 0
+    end
+    subgraph run.bat
+        1 --> config.py --> auth.py --> uvicorn
+        2 --> auth.py
+        0 --> uvicorn
+    end
+
 ```
 
 ---
