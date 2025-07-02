@@ -92,26 +92,36 @@ Use base64 to decode the JWT_TOKEN in the `.env` in the same directory to obtain
 
 ---
 
-### run.bat
+### precheck.py
 Run commands in sequence to avoid manual input by the user
 ```mermaid
 flowchart TD
-    A[Start] --> B(Activate Conda Env);
-    B --> C{Check Credentials };
-    C -- Missing/Empty --> D[Run config.py];
-    D --> E{Check HEARTBEAT_SESSION_ID};
-    C -- Credentials OK --> E;
-
-    E -- Missing/Empty --> F[Run auth.py];
-    F --> G[Start Server];
-    G --> H[End];
-
-    E -- Found --> I[Run tokentest.py];
-    I --> J{Check EXPIRE value from .env};
-    J -- EXPIRE = True --> F;
-    J -- EXPIRE = False --> G;
-    J -- Not Set/Invalid --> K[Show Error];
-    K --> H;
+  A[Start checking] --> B{.env file exists?}
+  
+  B -->|No|C[Run config.py]
+  B -->|Yes|D[Load environment variables]
+  
+  D --> E{Username and password exist?}
+  E -->|No|C
+  E -->|Yes|F{Token complete?}
+  
+  F -->|No|G[Run auth.py]
+  F -->|Yes|H[Run tokentest.py]
+  
+  H --> I{Check successful?}
+  I -->|No|G
+  I -->|Yes|J{Refresh EXPIRE status}
+  
+  J -->|Yes|K[Start uvicorn service]
+  J -->|No|G
+  
+  C --> L{config successful?}
+  L -->|No|M[Exit]
+  L -->|Yes|G
+  
+  G --> N{auth successful?}
+  N -->|No|M
+  N -->|Yes|K
 ```
 
 ---
