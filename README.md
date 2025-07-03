@@ -47,7 +47,7 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
 - Create the conda environment from the file:
   `conda env create -f environment.yml`
 
-#### Initial Configuration
+#### Start the service
 ##### Method 1: Using Automation Scripts
 - double click `run.bat`
 ##### Method 2: Manual configuration
@@ -56,7 +56,7 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
 - In the same terminal window, run the configuration script:
   `python config.py`
 
-  Enter your XJTLU username and password. The script will generate a `.env` file to store your credentials, so you won't have to enter them again. _Please protect your personal information!_
+  Enter your XJTLU username and password. The script will generate a `.env` file to store your credentials, so you won't have to enter them again. _Please protect your personal information, never share the `.env` file with others!_
 - Run the authentication script to get a token:
   `python auth.py`
   No user interaction is required during this step; just wait for the terminal to confirm completion. (This requires Google Chrome to be installed).
@@ -64,13 +64,13 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
   `uvicorn adapter:app --reload`
 
   This will also create a `log` folder in the project directory for storing logs.
+
+#### Trying It Out
 - Connect your Desktop Client:
   Create a new provider, select the 'OpenAI Compatible' type. The API Key can be any random string of letters. Set the Base URL to `http://127.0.0.1:8000/v1/chat/completions`.
 
   Fetch the available models. The model list is hardcoded in the program and cannot be fetched in real-time. Directly entering a valid model ID will pass it to the web service.
-
-#### Trying It Out
-Start a new chat, select a model, and begin your conversation.
+- Start a new chat, select a model, and begin your conversation.
 
 ## How It Works
 
