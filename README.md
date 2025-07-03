@@ -209,6 +209,6 @@ This journey was like navigating through a thick fog, setting a course based on 
 |"don't have relevant knowledge"|Enter "poisonous text", the backend cannot read it|Delete the last conversation of this session|
 |"Request Err!"|Enter "poisonous text", the backend cannot read it|Delete the last conversation of this session|
 |'INFO:     127.0.0.1:7607 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error'|Token error|re-run auth.py|
-|'Request too fast, please try again later!'|?|?|
+|'Request too fast, please try again later!'|Conflict with scripted automatic messages|Try again in a few seconds|
 
 ## To do list
