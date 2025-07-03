@@ -50,6 +50,9 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
   `conda activate genai_project`
 
 #### Initial Configuration
+##### Method 1: Using Automation Scripts
+- double click `run.bat`
+##### Method 2: Manual configuration
 - In the same terminal window, run the configuration script:
   `python config.py`
 
