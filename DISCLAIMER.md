@@ -1,3 +1,5 @@
+ ![](XIPUAI-Term-of-Use-025-07-03.png)
+
 # Disclaimer (English Version)
 
 This project is an open-source tool created for educational and research purposes. It aims to migrate a specific web service to a more feature-rich desktop application, enhancing the user experience by addressing limitations in the original web interface, such as knowledge base integration, extended context management, and live web search capabilities.
