@@ -121,9 +121,9 @@ graph TD
     end
     subgraph run.bat
         a[start] --> b[conda environment check] --> c[activate 'genai_project' environment] --> d[run precheck.py] --> A
-        1 --> config.py --> auth.py --> uvicorn
+        1 --> config.py --> auth.py --> e[uvicorn service start]
         2 --> auth.py
-        0 --> e[uvicorn service start]
+        0 --> e
     end
 
 ```
