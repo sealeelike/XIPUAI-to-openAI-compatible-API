@@ -1,4 +1,3 @@
-# xjtlu_adapter_final_v12.py - 添加心跳保活机制
 import os
 import httpx
 from fastapi import FastAPI, Request, HTTPException
@@ -21,14 +20,13 @@ DELETE_SESSION_URL = f"{BASE_URL}/delSession?sf_request_type=ajax"
 
 # --- Tweakable Parameters ---
 INTER_REQUEST_DELAY = 1.0 
-MAX_CONTENT_LENGTH = 1500
 ENABLE_AUTO_DELETION = True
 
 # ===================================================================
 # ==                    心跳保活机制配置                           ==
 # ===================================================================
 # 心跳间隔（秒）- 用户静默多长时间后开始发送心跳
-HEARTBEAT_INTERVAL = 1200  # 20分钟，可自定义
+HEARTBEAT_INTERVAL = 1200
 # 是否启用心跳功能
 ENABLE_HEARTBEAT = True
 # 心跳会话名称
@@ -79,25 +77,7 @@ def get_dynamic_headers():
     }
 
 def process_and_format_prompt(messages: list) -> str:
-    """处理消息并截断长内容块"""
-    processed_messages = []
-    for msg in messages:
-        content = msg.get("content", "")
-        if len(content) > MAX_CONTENT_LENGTH:
-            half_len = MAX_CONTENT_LENGTH // 2
-            truncated_content = (
-                f"{content[:half_len]}\n\n"
-                f"[... Note: The middle of the preceding reference material has been truncated by the adapter due to its excessive length ...]\n\n"
-                f"{content[-half_len:]}"
-            )
-            logger.warning(f"Content from role '{msg['role']}' was TRUNCATED from {len(content)} to {len(truncated_content)} chars.")
-            processed_msg = msg.copy()
-            processed_msg["content"] = truncated_content
-            processed_messages.append(processed_msg)
-        else:
-            processed_messages.append(msg)
-
-    prompt_parts = [f"{msg.get('role', 'user').capitalize()}: {msg.get('content', '')}" for msg in processed_messages]
+    prompt_parts = [f"{msg.get('role', 'user').capitalize()}:\n{msg.get('content', '')}" for msg in messages]
     full_prompt = "\n\n".join(prompt_parts)
     logger.info(f"Final, PROCESSED prompt for backend:\n---\n{full_prompt}\n---")
     return full_prompt
