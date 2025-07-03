@@ -130,6 +130,8 @@ graph TD
 
 ---
 ### adapter.py
+#### How it transforms web services into API services？
+The core concept is to package each user request (including context) into a single block of text and send it to the web service.
 
 When a desktop client (like Cherry Studio) sends a chat request to our adapter, the following sequence of events unfolds:
 
@@ -165,6 +167,11 @@ When a desktop client (like Cherry Studio) sends a chat request to our adapter, 
     *   This "garbage collection" mechanism is the guarantee that our "stateless" model can operate long-term.
 
 This process forms a perfect closed loop: **Create -> Use -> Destroy**. Every conversation is a new, independent interaction that does not rely on the server's historical state, giving the desktop client full control over the context.
+
+#### How it keep alive?
+The adapter script establishes and reuses a 'Persistent Heartbeat Session.' 
+The adapter service keeps this session active by sending a token-free `savesession` message to the web service at a configurable 20-minute interval.
+
 
 ---
 
