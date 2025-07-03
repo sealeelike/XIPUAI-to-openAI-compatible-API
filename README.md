@@ -214,3 +214,4 @@ This journey was like navigating through a thick fog, setting a course based on 
 ## To do list
 - [ ] `adapter.py`, remove maxtoken cut
 - [ ] `adapter.py`, optimize input format
+- [ ] `adapter.py`, Isolate the "heartbeat" as a subprocess
