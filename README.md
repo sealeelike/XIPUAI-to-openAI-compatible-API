@@ -1,5 +1,6 @@
 # XIPUAI-to-OpenAI-compatible-API
-
+> [!IMPORTANT]
+> Please read [DISCLAIMER](DISCLAIMER.md) first
 ## Table of Contents
 
 [English](README.md)/[简体中文](README-zh.md)
