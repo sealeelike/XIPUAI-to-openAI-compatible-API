@@ -88,6 +88,7 @@ This is a simple script for storing credentials. The user enters their username 
 - Launches a temporary Chrome window.
 - Simulates the user entering their credentials and clicking "Log In".
 - Intercepts the necessary authentication token and saves it to the `.env` file.
+
   Each time a new token is fetched, it overwrites the old one.
 
 ---
