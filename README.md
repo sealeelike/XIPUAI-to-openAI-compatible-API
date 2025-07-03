@@ -215,3 +215,4 @@ This journey was like navigating through a thick fog, setting a course based on 
 - [x] `adapter.py`, remove maxtoken cut
 - [x] `adapter.py`, optimize input format
 - [ ] `adapter.py`, Isolate the "heartbeat" as a subprocess
+- [ ] `adapter.py`, support MCP
