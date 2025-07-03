@@ -32,7 +32,7 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
 
 ### Prerequisites
 
-- An XJTLU student or faculty account.
+- An XJTLU student or staff account.
 - See [libraries](libraries) for a list of dependencies.
 - Developed on Windows 11.
 - The `auth` module requires the Google Chrome browser to be installed.
