@@ -5,7 +5,7 @@
 [English](README.md)/[简体中文](README-zh.md)
 
 
-- [Overview](#overview) <---whatch video
+- [Overview](#overview)
 - [Background](#background)
 - [How to Use](#how-to-use)
   - [Prerequisites](#prerequisites)
