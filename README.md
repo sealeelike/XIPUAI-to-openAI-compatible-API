@@ -123,7 +123,7 @@ graph TD
         a[start] --> b[conda environment check] --> c[activate 'genai_project' environment] --> d[run precheck.py] --> A
         1 --> config.py --> auth.py --> uvicorn
         2 --> auth.py
-        0 --> uvicorn
+        0 --> e[uvicorn service start]
     end
 
 ```
