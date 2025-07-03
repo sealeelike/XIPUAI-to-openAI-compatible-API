@@ -101,10 +101,9 @@ graph TD
         A --exist--> D{username & password exist?}
         A --does not exist--> 1
 
-        D --all exist--> E
+        D --all exist--> F{tokens exist?}
         D --dose not exist--> 1
 
-        E --> F{tokens exist?}
         F --D.N.E.--> 2
         F --exist--> H{heartbeat session exist?}
         H --exist--> I{tokentest.py}
