@@ -212,3 +212,5 @@ This journey was like navigating through a thick fog, setting a course based on 
 |'Request too fast, please try again later!'|Conflict with scripted automatic messages|Try again in a few seconds|
 
 ## To do list
+- [ ] `adapter.py`, remove maxtoken cut
+- [ ] `adapter.py`, optimize input format
