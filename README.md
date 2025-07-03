@@ -56,7 +56,8 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
 - In the same terminal window, run the configuration script:
   `python config.py`
 
-  Enter your XJTLU username and password. The script will generate a `.env` file to store your credentials, so you won't have to enter them again. _Please protect your personal information, never share the `.env` file with others!_
+  Enter your XJTLU username and password. The script will generate a `.env` file to store your credentials, so you won't have to enter them again.
+  > _Please protect your personal information and never share the `.env` file with others!_
 - Run the authentication script to get a token:
   `python auth.py`
   No user interaction is required during this step; just wait for the terminal to confirm completion. (This requires Google Chrome to be installed).
