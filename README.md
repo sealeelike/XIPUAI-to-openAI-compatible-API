@@ -19,11 +19,10 @@
 
 This project transforms the XIPUAI web service into an OpenAI-compatible API, enabling API calls that support knowledge bases, context, web search, temperature settings, and more.
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-<mark>Click the video link for a preview: https://drive.google.com/file/d/1-OGXcUYPfYZpAO9FbemmOAfxXSMPdFfM/view?usp=sharing</mark>
+> [!TIP]
+> Click the video link for a preview: https://drive.google.com/file/d/1-OGXcUYPfYZpAO9FbemmOAfxXSMPdFfM/view?usp=sharing
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## Background
 I was inspired by a project that reverse-engineered Google AI Studio into an OpenAI-formatted API service, allowing free use of the popular Gemini 2.5 Pro model ([CJackHwang/AIstudioProxyAPI](https://github.com/CJackHwang/AIstudioProxyAPI)).
@@ -57,7 +56,10 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
   `python config.py`
 
   Enter your XJTLU username and password. The script will generate a `.env` file to store your credentials, so you won't have to enter them again.
-  > _Please protect your personal information and never share the `.env` file with others!_
+
+> [!WARNING]
+> _Please take care of your privacy and never share the `.env` file with others!_
+
 - Run the authentication script to get a token:
   `python auth.py`
   No user interaction is required during this step; just wait for the terminal to confirm completion. (This requires Google Chrome to be installed).
