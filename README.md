@@ -203,4 +203,3 @@ This journey was like navigating through a thick fog, setting a course based on 
 |'INFO:     127.0.0.1:7607 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error'|Token error|re-run auth.py|
 
 ## To do list
-- [ ] automatic keep-alive
