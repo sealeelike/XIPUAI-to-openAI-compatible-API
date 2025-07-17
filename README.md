@@ -208,6 +208,7 @@ This journey was like navigating through a thick fog, setting a course based on 
 |--|--|--|
 |"403"|Token expired|Re-run auth.py|
 |"Unfortunately, I don't have any relevant information regarding this matter. However. Please feel free to ask me other questions, and I’ll do my best to help."|Enter "poisonous text", the backend cannot read it|Delete the last conversation of this session|
+|200OK but return nothing. Send the same question to the web service and it will return "Unfortunately, I don't......"|Banned words detected by the school|modify your prompt|
 |"Request Err!"|Enter "poisonous text", the backend cannot read it|Delete the last conversation of this session|
 |'INFO:     127.0.0.1:7607 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error'|Token error|re-run auth.py|
 |'Request too fast, please try again later!'|Conflict with scripted automatic messages|Try again in a few seconds|
