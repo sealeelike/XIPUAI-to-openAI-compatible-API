@@ -282,34 +282,72 @@ async def list_models():
 
 @app.post("/v1/chat/completions")
 async def chat_proxy(request: Request):
-    update_user_activity()  # 记录用户活动
-    
+    update_user_activity()  # Record user activity
+
     try:
         openai_request = await request.json()
         logger.info(f"\n--- CLIENT REQ ---\n{json.dumps(openai_request, indent=2, ensure_ascii=False)}\n------------------")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to parse request JSON: {e}", exc_info=True)
+        raise HTTPException(status_code=400, detail=f"Invalid JSON in request body: {e}")
+
+    # Check if the client requested a streaming response. Default to False.
+    is_streaming = openai_request.get("stream", False)
 
     # Step 1: Create a new, fully configured session
     session_id_to_use = await create_new_session(openai_request)
     
-    # Step 2: Process messages for length and format into a single prompt
+    # Step 2: Process messages and create the full prompt
     messages = openai_request.get("messages", [])
     if not messages:
-        if ENABLE_AUTO_DELETION: asyncio.create_task(delete_session(session_id_to_use))
+        if ENABLE_AUTO_DELETION:
+            asyncio.create_task(delete_session(session_id_to_use))
         raise HTTPException(status_code=400, detail="No 'messages' in request.")
     
     full_prompt = process_and_format_prompt(messages)
     
-    # Step 3: Add the critical delay
+    # Step 3: Add the critical delay to avoid rate-limiting
     await asyncio.sleep(INTER_REQUEST_DELAY)
 
-    # Step 4: Stream the final answer
+    # Step 4: Prepare the payload for the upstream XJTLU service
     xjtlu_payload = {"text": full_prompt, "files": [], "sessionId": session_id_to_use}
 
-    async def stream_generator():
+    # === Logic to handle STREAMING vs. NON-STREAMING ===
+    
+    if is_streaming:
+        # Use the existing generator for streaming responses
+        async def stream_generator():
+            try:
+                logger.info(f"Streaming response for Session ID: {session_id_to_use}")
+                async with client.stream("POST", CHAT_API_URL, json=xjtlu_payload, headers=get_dynamic_headers()) as response:
+                    response.raise_for_status()
+                    async for line in response.aiter_lines():
+                        if line.startswith("data:"):
+                            chunk_str = line[len("data:"):].strip()
+                            if not chunk_str or chunk_str == "[DONE]": continue
+                            try:
+                                xjtlu_chunk = json.loads(chunk_str)
+                                data_content = xjtlu_chunk.get("data")
+                                if not isinstance(data_content, str): continue
+                                openai_chunk = {"id": f"chatcmpl-{uuid.uuid4()}", "object": "chat.completion.chunk", "created": int(time.time()), "model": openai_request.get("model"), "choices": [{"index": 0, "delta": {"content": data_content}, "finish_reason": None}]}
+                                yield f"data: {json.dumps(openai_chunk)}\n\n"
+                            except json.JSONDecodeError: continue
+                    done_chunk = {"id": f"chatcmpl-{uuid.uuid4()}", "object": "chat.completion.chunk", "created": int(time.time()), "model": openai_request.get("model"), "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]}
+                    yield f"data: {json.dumps(done_chunk)}\n\n"
+                    yield "data: [DONE]\n\n"
+                    logger.info(f"Stream finished for Session ID: {session_id_to_use}.")
+            finally:
+                if ENABLE_AUTO_DELETION:
+                    logger.info(f"Scheduling session {session_id_to_use} for deletion.")
+                    asyncio.create_task(delete_session(session_id_to_use))
+        
+        return StreamingResponse(stream_generator(), media_type="text/event-stream")
+
+    else:
+        # Handle the non-streaming request for Dify's validation
+        full_content = ""
         try:
-            logger.info(f"Sending final prompt to Session ID: {session_id_to_use}")
+            logger.info(f"Non-streaming response for Session ID: {session_id_to_use}")
             async with client.stream("POST", CHAT_API_URL, json=xjtlu_payload, headers=get_dynamic_headers()) as response:
                 response.raise_for_status()
                 async for line in response.aiter_lines():
@@ -319,23 +357,26 @@ async def chat_proxy(request: Request):
                         try:
                             xjtlu_chunk = json.loads(chunk_str)
                             data_content = xjtlu_chunk.get("data")
-                            if not isinstance(data_content, str): continue
-                            openai_chunk = {"id": f"chatcmpl-{uuid.uuid4()}", "object": "chat.completion.chunk", "created": int(time.time()), "model": openai_request.get("model"), "choices": [{"index": 0, "delta": {"content": data_content}, "finish_reason": None}]}
-                            yield f"data: {json.dumps(openai_chunk)}\n\n"
+                            if isinstance(data_content, str):
+                                full_content += data_content
                         except json.JSONDecodeError: continue
-                done_chunk = {"id": f"chatcmpl-{uuid.uuid4()}", "object": "chat.completion.chunk", "created": int(time.time()), "model": openai_request.get("model"), "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]}
-                yield f"data: {json.dumps(done_chunk)}\n\n"
-                yield "data: [DONE]\n\n"
-                logger.info(f"Stream finished for Session ID: {session_id_to_use}.")
+
+            # Construct the standard OpenAI non-streaming response object
+            response_json = {
+                "id": f"chatcmpl-{uuid.uuid4()}", "object": "chat.completion",
+                "created": int(time.time()), "model": openai_request.get("model"),
+                "choices": [{
+                    "index": 0, "message": {"role": "assistant", "content": full_content},
+                    "finish_reason": "stop"
+                }],
+                "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            }
+            logger.info(f"Non-streaming response assembled for Session ID: {session_id_to_use}.")
+            return JSONResponse(content=response_json)
         finally:
-            # Step 5: Cleanup (respecting the debug switch)
             if ENABLE_AUTO_DELETION:
-                logger.info(f"Request for session {session_id_to_use} is complete. Scheduling for deletion.")
+                logger.info(f"Scheduling session {session_id_to_use} for deletion.")
                 asyncio.create_task(delete_session(session_id_to_use))
-            else:
-                logger.info(f"Request for session {session_id_to_use} is complete. Auto-deletion is DISABLED for debugging.")
-            
-    return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
 # 添加心跳状态查询端点
 @app.get("/heartbeat/status")
