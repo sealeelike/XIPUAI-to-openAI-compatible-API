@@ -71,7 +71,7 @@ Seeing expensive models like Claude 3 Opus and Sonnet 3.7 on the XJTLU AI platfo
 
 #### Trying It Out
 - Connect your Desktop Client:
-  Create a new provider, select the 'OpenAI Compatible' type. The API Key can be any random string of letters. Set the Base URL to `http://127.0.0.1:8000/v1/chat/completions`.
+  Create a new provider, select the 'OpenAI Compatible' type. The API Key can be any random string of letters. Set the Base URL to `http://127.0.0.1:8000/v1/chat/completions` (`http://host.docker.internal:8000/v1` for Dify in docker).
 
   Fetch the available models. The model list is hardcoded in the program and cannot be fetched in real-time. Directly entering a valid model ID will pass it to the web service.
 - Start a new chat, select a model, and begin your conversation.
